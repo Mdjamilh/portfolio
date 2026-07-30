@@ -4,7 +4,7 @@
  */
 export const profile = {
   name: "Md. Jamil Hossain",
-  role: "Software developer",
+  role: "Aspiring software engineer",
   focus: "Healthcare software and full-stack web applications",
   location: "",
   /** Public contact address. Left empty until confirmed for publication. */
