@@ -1,0 +1,61 @@
+---
+import { profile } from "../data/profile";
+import { repoUrl } from "../data/projects";
+
+const built = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+---
+
+<footer class="colophon">
+  <div>
+    <p class="label">Contact</p>
+    <ul>
+      {profile.email && <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>}
+      <li><a href={profile.github}>GitHub</a></li>
+      {profile.linkedin && <li><a href={profile.linkedin}>LinkedIn</a></li>}
+    </ul>
+  </div>
+  <div>
+    <p class="label">Colophon</p>
+    <p>
+      Set in Newsreader, Inter and JetBrains Mono. Built with Astro as a static site, with no tracking. Figures read from GitHub on {built}.
+      <a href={repoUrl("portfolio")}>Source</a>.
+    </p>
+  </div>
+  <p class="copy">© {new Date().getUTCFullYear()} {profile.name}</p>
+</footer>
+
+<style>
+  .colophon {
+    display: grid;
+    grid-template-columns: minmax(10rem, 16rem) minmax(0, 36rem);
+    gap: 1rem 4rem;
+    margin-top: 6rem;
+    padding: 2.5rem var(--gutter) 3rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .label {
+    margin-bottom: 0.4rem;
+  }
+
+  .copy {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .colophon {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
