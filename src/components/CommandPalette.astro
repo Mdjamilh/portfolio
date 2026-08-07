@@ -1,0 +1,211 @@
+---
+import { projects, repoUrl } from "../data/projects";
+import { profile } from "../data/profile";
+import type { Entry } from "../lib/search";
+
+const entries: Entry[] = [
+  { title: "Selected work", kind: "Section", href: "/#work" },
+  { title: "Index of projects", kind: "Section", href: "/#index" },
+  { title: "About", kind: "Section", href: "/#about", keywords: ["principles", "skills"] },
+  { title: "Résumé", kind: "Page", href: "/resume", keywords: ["cv", "resume", "education", "print"] },
+  ...projects.map((p) => ({ title: p.title, kind: "Case study", href: `/work/${p.slug}`, keywords: [p.slug, p.domain, ...p.stack] })),
+  ...projects.filter((p) => p.live).map((p) => ({ title: p.title, kind: p.live!.includes("github.com") ? "Download" : "Live demo", href: p.live!, keywords: [p.slug, "demo", "live"] })),
+  { title: "GitHub profile", kind: "External", href: profile.github, keywords: ["source", "code", "repositories"] },
+  { title: "Source of this site", kind: "External", href: repoUrl("portfolio"), keywords: ["code"] },
+];
+---
+
+<dialog class="palette" aria-label="Find a page or project" data-palette>
+  <form method="dialog" role="search">
+    <label class="visually-hidden" for="palette-input">Find a page or project</label>
+    <input
+      id="palette-input"
+      type="text"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder="Find a project, technology or page"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-results"
+      aria-autocomplete="list"
+    />
+    <kbd aria-hidden="true">Esc</kbd>
+  </form>
+  <ul id="palette-results" role="listbox" aria-label="Results"></ul>
+  <p class="empty" hidden>Nothing matches. Try a technology such as “FHIR” or “Go”.</p>
+  <p class="hint label" aria-hidden="true">↑ ↓ to move · Enter to open</p>
+</dialog>
+
+<script type="application/json" id="palette-entries" set:html={JSON.stringify(entries)} />
+
+<script>
+  import { rank, type Entry } from "../lib/search";
+
+  const dialog = document.querySelector<HTMLDialogElement>("[data-palette]")!;
+  const input = dialog.querySelector("input")!;
+  const list = dialog.querySelector<HTMLUListElement>("#palette-results")!;
+  const empty = dialog.querySelector<HTMLParagraphElement>(".empty")!;
+  const entries = JSON.parse(document.getElementById("palette-entries")!.textContent!) as Entry[];
+  let results: Entry[] = [];
+  let active = 0;
+
+  function render() {
+    results = rank(entries, input.value);
+    active = Math.min(active, Math.max(results.length - 1, 0));
+    list.replaceChildren(
+      ...results.map((entry, i) => {
+        const li = document.createElement("li");
+        li.id = `palette-option-${i}`;
+        li.setAttribute("role", "option");
+        li.setAttribute("aria-selected", String(i === active));
+        const title = document.createElement("span");
+        title.textContent = entry.title;
+        const kind = document.createElement("span");
+        kind.className = "kind";
+        kind.textContent = entry.kind;
+        li.append(title, kind);
+        li.addEventListener("click", () => go(entry));
+        li.addEventListener("mousemove", () => {
+          if (active !== i) {
+            active = i;
+            render();
+          }
+        });
+        return li;
+      }),
+    );
+    empty.hidden = results.length > 0;
+    if (results.length) input.setAttribute("aria-activedescendant", `palette-option-${active}`);
+    else input.removeAttribute("aria-activedescendant");
+    list.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
+  }
+
+  function go(entry: Entry) {
+    dialog.close();
+    if (/^https?:/.test(entry.href)) window.open(entry.href, "_blank", "noopener");
+    else window.location.href = entry.href;
+  }
+
+  function open() {
+    if (dialog.open) return;
+    input.value = "";
+    active = 0;
+    render();
+    dialog.showModal();
+    input.focus();
+  }
+
+  input.addEventListener("input", () => {
+    active = 0;
+    render();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!results.length) return;
+      active = (active + (e.key === "ArrowDown" ? 1 : -1) + results.length) % results.length;
+      render();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const entry = results[active];
+      if (entry) go(entry);
+    }
+  });
+
+  // Clicking the backdrop (outside the panel) closes it.
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  document.querySelectorAll("[data-open-palette]").forEach((b) => b.addEventListener("click", open));
+
+  document.addEventListener("keydown", (e) => {
+    const typing = e.target instanceof HTMLElement && (e.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
+    if ((e.key === "k" || e.key === "K") && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      open();
+    } else if (e.key === "/" && !typing) {
+      e.preventDefault();
+      open();
+    }
+  });
+</script>
+
+<style>
+  .palette {
+    width: min(36rem, calc(100vw - 2rem));
+    margin: 12vh auto auto;
+    padding: 0;
+    border: 1px solid var(--rule-strong);
+    border-radius: 4px;
+    background: var(--paper-raised);
+    color: var(--ink);
+    box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.35);
+  }
+
+  .palette::backdrop {
+    background: rgb(10 14 18 / 0.45);
+  }
+
+  form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.7rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 1.05rem var(--sans);
+    outline: none;
+  }
+
+  ul {
+    max-height: min(24rem, 55vh);
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+  }
+
+  ul :global(li) {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  ul :global(li[aria-selected="true"]) {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  ul :global(.kind) {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  .empty {
+    padding: 0.5rem 1.1rem 0.9rem;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .hint {
+    margin: 0;
+    padding: 0.55rem 1rem;
+    border-top: 1px solid var(--rule);
+  }
+</style>
