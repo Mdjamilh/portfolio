@@ -1,0 +1,124 @@
+---
+import { projects, repoUrl } from "../data/projects";
+
+const selected = projects.filter((p) => p.selected);
+---
+
+<section id="work" class="work" aria-labelledby="work-title">
+  <header class="section-head">
+    <p class="label">§ 1</p>
+    <h2 id="work-title">Selected work</h2>
+    <p class="lede">Six projects that show the range: clinical workflows, health data standards, retrieval, real-time collaboration and developer tooling.</p>
+  </header>
+
+  <ol class="entries">
+    {
+      selected.map((p, i) => (
+        <li class="entry">
+          <span class="no" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+          <div class="body">
+            <p class="label">{p.domain}</p>
+            <h3>
+              <a href={`/work/${p.slug}`}>{p.title}</a>
+            </h3>
+            <p class="summary">{p.summary}</p>
+            <ul class="tags" aria-label="Technologies">
+              {p.stack.map((s) => (
+                <li>{s}</li>
+              ))}
+            </ul>
+          </div>
+          <ul class="links" aria-label={`${p.title} links`}>
+            <li>
+              <a href={`/work/${p.slug}`}>Case study</a>
+            </li>
+            {p.live && (
+              <li>
+                <a href={p.live}>{p.live.includes("github.com") ? "Download" : "Live demo"}</a>
+              </li>
+            )}
+            <li>
+              <a href={repoUrl(p.slug)}>Source</a>
+            </li>
+          </ul>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .work {
+    padding: 4.5rem var(--gutter) 2rem;
+  }
+
+  .entries {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: entry;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) 9rem;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .entry:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .no {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--rule-strong);
+    font-variant-numeric: lining-nums;
+    transition: color 0.2s;
+  }
+
+  .entry:hover .no,
+  .entry:focus-within .no {
+    color: var(--accent);
+  }
+
+  h3 {
+    margin: 0.35rem 0 0.6rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  h3 a {
+    text-decoration: none;
+  }
+
+  .summary {
+    max-width: 62ch;
+    color: var(--ink-soft);
+  }
+
+  .links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9rem;
+    line-height: 2;
+  }
+
+  @media (max-width: 760px) {
+    .entry {
+      grid-template-columns: 3rem minmax(0, 1fr);
+    }
+    .links {
+      grid-column: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 1.25rem;
+    }
+    .no {
+      font-size: 1.8rem;
+    }
+  }
+</style>
