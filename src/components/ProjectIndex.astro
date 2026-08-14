@@ -1,0 +1,284 @@
+---
+import { domains, projects, repoUrl } from "../data/projects";
+import { monthYear, type RepoFacts } from "../lib/github";
+
+interface Props {
+  facts: Map<string, RepoFacts>;
+}
+
+const { facts } = Astro.props;
+---
+
+<section id="index" class="index" aria-labelledby="index-title">
+  <header class="section-head">
+    <p class="label">§ 2</p>
+    <h2 id="index-title">Index of projects</h2>
+    <p class="lede">Every public project, with its domain, stack and history. Open a row for the full case study.</p>
+  </header>
+
+  <div class="controls" data-index-controls hidden>
+    <fieldset>
+      <legend class="visually-hidden">Filter by domain</legend>
+      <label><input type="radio" name="domain" value="" checked /> All</label>
+      {
+        domains.map((d) => (
+          <label>
+            <input type="radio" name="domain" value={d} /> {d}
+          </label>
+        ))
+      }
+    </fieldset>
+    <label class="filter">
+      <span class="visually-hidden">Filter by name or technology</span>
+      <input type="search" placeholder="Filter by name or technology" data-index-query />
+    </label>
+  </div>
+
+  <p class="count label" aria-live="polite" data-index-count>{projects.length} projects</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col" class="num">No.</th>
+          <th scope="col">Project</th>
+          <th scope="col" class="hide-sm">Domain</th>
+          <th scope="col" class="hide-md">Stack</th>
+          <th scope="col" class="num hide-sm">Commits</th>
+          <th scope="col" class="hide-md">Last change</th>
+          <th scope="col"><span class="visually-hidden">Links</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          projects.map((p, i) => {
+            const f = facts.get(p.slug);
+            return (
+              <tr data-domain={p.domain} data-search={[p.title, p.slug, p.summary, ...p.stack].join(" ").toLowerCase()}>
+                <td class="num label">{String(i + 1).padStart(2, "0")}</td>
+                <th scope="row">
+                  <a href={`/work/${p.slug}`}>{p.title}</a>
+                  <span class="summary">{p.summary}</span>
+                </th>
+                <td class="hide-sm">{p.domain}</td>
+                <td class="hide-md stack">{p.stack.slice(0, 3).join(", ")}</td>
+                <td class="num hide-sm">{f?.commits ?? "–"}</td>
+                <td class="hide-md">{monthYear(f?.pushedAt ?? null) || "–"}</td>
+                <td class="links">
+                  {p.live && (
+                    <a href={p.live} aria-label={`${p.title}: ${p.live.includes("github.com") ? "download" : "live demo"}`}>
+                      {p.live.includes("github.com") ? "Get" : "Live"}
+                    </a>
+                  )}
+                  <a href={repoUrl(p.slug)} aria-label={`${p.title}: source code`}>
+                    Code
+                  </a>
+                </td>
+              </tr>
+            );
+          })
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="none" data-index-none hidden>No project matches that filter.</p>
+</section>
+
+<script>
+  import { matchesFilter } from "../lib/filter";
+
+  // The table works without JavaScript; the filters appear only when they can work.
+  const controls = document.querySelector<HTMLElement>("[data-index-controls]")!;
+  const query = document.querySelector<HTMLInputElement>("[data-index-query]")!;
+  const count = document.querySelector<HTMLElement>("[data-index-count]")!;
+  const none = document.querySelector<HTMLElement>("[data-index-none]")!;
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>("#index tbody tr")];
+  controls.hidden = false;
+
+  function apply() {
+    const domain = controls.querySelector<HTMLInputElement>('input[name="domain"]:checked')?.value ?? "";
+    let shown = 0;
+    for (const row of rows) {
+      const visible = matchesFilter({ domain: row.dataset.domain!, text: row.dataset.search! }, domain, query.value);
+      row.hidden = !visible;
+      if (visible) shown++;
+    }
+    count.textContent = shown === rows.length ? `${rows.length} projects` : `${shown} of ${rows.length} projects`;
+    none.hidden = shown > 0;
+  }
+
+  controls.addEventListener("change", apply);
+  query.addEventListener("input", apply);
+</script>
+
+<style>
+  .index {
+    padding: 4.5rem var(--gutter) 2rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .controls[hidden] {
+    display: none;
+  }
+
+  fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  fieldset label {
+    position: relative;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  fieldset input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  fieldset label:has(input:checked) {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  fieldset label:has(input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .filter input {
+    width: min(18rem, 100%);
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: var(--paper-raised);
+    color: var(--ink);
+    font: 0.9rem var(--sans);
+  }
+
+  .filter {
+    flex: 0 1 18rem;
+  }
+
+  .count {
+    margin: 0 0 0.5rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+
+  thead th {
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    border-bottom: 2px solid var(--ink);
+    text-align: left;
+    font: 500 0.7rem/1 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--rule);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover {
+    background: var(--paper-raised);
+  }
+
+  tbody tr[hidden] {
+    display: none;
+  }
+
+  td,
+  tbody th {
+    padding: 0.85rem 0.75rem 0.85rem 0;
+    vertical-align: top;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  tbody th a {
+    font-family: var(--serif);
+    font-size: 1.12rem;
+    text-decoration: none;
+  }
+
+  .summary {
+    display: block;
+    max-width: 52ch;
+    margin-top: 0.2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    padding-right: 1.25rem;
+  }
+
+  td.num.label {
+    padding-top: 1.05rem;
+  }
+
+  .stack {
+    color: var(--ink-soft);
+  }
+
+  .links {
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .links a + a {
+    margin-left: 0.75rem;
+  }
+
+  .none {
+    padding: 1.5rem 0;
+    color: var(--muted);
+  }
+
+  @media (max-width: 980px) {
+    .hide-md {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hide-sm {
+      display: none;
+    }
+    .num {
+      padding-right: 0.75rem;
+    }
+  }
+</style>
