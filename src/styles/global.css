@@ -227,3 +227,37 @@ kbd {
   border-radius: 3px;
   color: var(--muted);
 }
+
+/* Numbered section headings, set like a report. */
+.section-head {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  column-gap: 1.5rem;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+
+.section-head .label {
+  margin: 0;
+  color: var(--marker);
+}
+
+.section-head h2 {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+}
+
+.section-head .lede {
+  grid-column: 2;
+  max-width: 60ch;
+  margin: 0.75rem 0 0;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .section-head {
+    grid-template-columns: 1fr;
+  }
+  .section-head .lede {
+    grid-column: 1;
+  }
+}

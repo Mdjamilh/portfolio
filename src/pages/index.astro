@@ -1,16 +1,21 @@
 ---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import SelectedWork from "../components/SelectedWork.astro";
+import ProjectIndex from "../components/ProjectIndex.astro";
+import About from "../components/About.astro";
+import { GITHUB_USER, projects } from "../data/projects";
+import { repoFacts, totals } from "../lib/github";
+
+const facts = await repoFacts(
+  GITHUB_USER,
+  projects.map((p) => p.slug),
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base>
+  <Hero figures={totals(facts)} />
+  <SelectedWork />
+  <ProjectIndex facts={facts} />
+  <About />
+</Base>
