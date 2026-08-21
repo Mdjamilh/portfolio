@@ -29,7 +29,11 @@ const path = Astro.url.pathname;
     </ul>
   </nav>
   <div class="tools">
-    <button type="button" class="find" data-open-palette aria-keyshortcuts="Control+K Meta+K /">
+    <button type="button" class="find" data-open-palette aria-label="Find a page or project" aria-keyshortcuts="Control+K Meta+K /">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
+        <path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+      </svg>
       <span>Find</span>
       <kbd>Ctrl K</kbd>
     </button>
@@ -151,14 +155,6 @@ const path = Astro.url.pathname;
     .find span,
     .find kbd {
       display: none;
-    }
-    .find::before {
-      content: "";
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid currentColor;
-      border-radius: 50%;
-      box-shadow: 4px 4px 0 -2.5px currentColor;
     }
     nav ul {
       gap: 0.9rem;
