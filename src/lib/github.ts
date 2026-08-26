@@ -76,3 +76,11 @@ export function monthYear(iso: string | null): string {
   if (!iso) return "";
   return new Date(iso).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
 }
+
+let shared: Promise<Map<string, RepoFacts>> | undefined;
+
+/** One request set per build, shared by every page that shows figures. */
+export function buildFacts(user: string, repos: string[]): Promise<Map<string, RepoFacts>> {
+  shared ??= repoFacts(user, repos);
+  return shared;
+}
