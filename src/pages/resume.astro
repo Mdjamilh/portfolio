@@ -1,0 +1,302 @@
+---
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import Base from "../layouts/Base.astro";
+import { profile } from "../data/profile";
+import { projects, repoUrl } from "../data/projects";
+
+/** Dropping a file at public/resume.pdf is all it takes to publish the PDF. */
+const hasPdf = existsSync(join(process.cwd(), "public", "resume.pdf"));
+const selected = projects.filter((p) => p.selected);
+const others = projects.filter((p) => !p.selected);
+---
+
+<Base title="Resume" description={`Resume of ${profile.name}.`}>
+  <div class="page">
+    <div class="toolbar" data-no-print>
+      <p class="label">Resume</p>
+      <div class="actions">
+        {
+          hasPdf && (
+            <a class="button" href="/resume.pdf" download>
+              Download PDF
+            </a>
+          )
+        }
+        <button type="button" class={hasPdf ? "button quiet" : "button"} data-print>Print this page</button>
+      </div>
+    </div>
+
+    {
+      hasPdf && (
+        <object class="pdf" data="/resume.pdf" type="application/pdf" aria-label={`Resume of ${profile.name} (PDF)`} data-no-print>
+          <p>
+            Your browser cannot show the PDF here. <a href="/resume.pdf">Open the resume</a>.
+          </p>
+        </object>
+      )
+    }
+
+    <article class="cv" aria-labelledby="cv-name">
+      <header>
+        <h1 id="cv-name">{profile.name}</h1>
+        <p class="focus">{profile.focus}</p>
+        <ul class="contact">
+          {profile.email && <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>}
+          {profile.location && <li>{profile.location}</li>}
+          <li><a href={profile.github}>{profile.github.replace("https://", "")}</a></li>
+          {profile.linkedin && <li><a href={profile.linkedin}>{profile.linkedin.replace("https://", "")}</a></li>}
+        </ul>
+      </header>
+
+      <section aria-labelledby="cv-profile">
+        <h2 id="cv-profile">Profile</h2>
+        <p>{profile.abstract}</p>
+      </section>
+
+      {
+        profile.education.length > 0 && (
+          <section aria-labelledby="cv-education">
+            <h2 id="cv-education">Education</h2>
+            {profile.education.map((e) => (
+              <div class="item">
+                <div class="row">
+                  <h3>{e.programme}</h3>
+                  <span class="when">{e.period}</span>
+                </div>
+                <p class="where">{e.institution}</p>
+                {e.detail && <p>{e.detail}</p>}
+              </div>
+            ))}
+          </section>
+        )
+      }
+
+      <section aria-labelledby="cv-projects">
+        <h2 id="cv-projects">Selected projects</h2>
+        {
+          selected.map((p) => (
+            <div class="item">
+              <div class="row">
+                <h3>
+                  <a href={repoUrl(p.slug)}>{p.title}</a>
+                </h3>
+                <span class="when">{p.stack.slice(0, 4).join(", ")}</span>
+              </div>
+              <p>{p.summary}</p>
+            </div>
+          ))
+        }
+        <p class="more">
+          Also: {others.map((p) => p.title).join("; ")}. All at <a href={profile.github}>{profile.github.replace("https://", "")}</a>.
+        </p>
+      </section>
+
+      <section aria-labelledby="cv-skills">
+        <h2 id="cv-skills">Technologies</h2>
+        <dl>
+          {
+            profile.skills.map((s) => (
+              <div>
+                <dt>{s.group}</dt>
+                <dd>{s.items.join(", ")}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+    </article>
+  </div>
+</Base>
+
+<script>
+  document.querySelector("[data-print]")?.addEventListener("click", () => window.print());
+</script>
+
+<style>
+  .page {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 2.5rem var(--gutter) 0;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .toolbar .label {
+    margin: 0;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .pdf {
+    display: block;
+    width: 100%;
+    height: 80vh;
+    margin-bottom: 3rem;
+    border: 1px solid var(--rule);
+  }
+
+  .cv {
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+  }
+
+  .cv header {
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 400;
+  }
+
+  .focus {
+    margin: 0.4rem 0 0.75rem;
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9rem;
+  }
+
+  section {
+    padding-top: 1.75rem;
+  }
+
+  h2 {
+    margin-bottom: 0.75rem;
+    font: 500 0.75rem/1 var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--marker);
+  }
+
+  .item {
+    padding: 0.6rem 0;
+    break-inside: avoid;
+  }
+
+  .item p {
+    margin: 0.2rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+  }
+
+  h3 {
+    font-size: 1.12rem;
+  }
+
+  h3 a {
+    text-decoration: none;
+  }
+
+  .when {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .where {
+    font-style: italic;
+  }
+
+  .more {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  dl div {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.35rem 0;
+    font-size: 0.95rem;
+  }
+
+  dt {
+    font-weight: 500;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 640px) {
+    dl div {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+
+  /* Printed, the resume becomes a plain black-on-white document. */
+  @media print {
+    :global(.masthead),
+    :global(.colophon),
+    :global(.skip),
+    [data-no-print] {
+      display: none !important;
+    }
+    :global(body) {
+      background: #fff;
+      color: #000;
+      font-size: 10.5pt;
+    }
+    .page {
+      max-width: none;
+      padding: 0;
+    }
+    .cv {
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+    .item p,
+    dd,
+    .focus,
+    .more {
+      color: #222;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+
+  @page {
+    size: A4;
+    margin: 16mm 18mm;
+  }
+</style>
