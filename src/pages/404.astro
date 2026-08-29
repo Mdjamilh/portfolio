@@ -1,0 +1,24 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Page not found">
+  <section class="missing">
+    <p class="label">Error 404</p>
+    <h1>This page is not in the index.</h1>
+    <p>The address may have changed. Every project is listed in the <a href="/#index">index</a>, or press <kbd>Ctrl K</kbd> to search.</p>
+    <a class="button" href="/">Return to the home page</a>
+  </section>
+</Base>
+
+<style>
+  .missing {
+    max-width: 40rem;
+    padding: 6rem var(--gutter);
+  }
+
+  h1 {
+    margin: 0.75rem 0 1.25rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+</style>
