@@ -5,7 +5,7 @@ import { rank, type Entry } from "./search";
 const entries: Entry[] = [
   { title: "Clinic appointment scheduler", kind: "Case study", href: "/work/clinic", keywords: ["Next.js", "FHIR R4"] },
   { title: "Patient record explorer", kind: "Case study", href: "/work/fhir", keywords: ["fhir-patient-explorer", "FHIR R4"] },
-  { title: "Résumé", kind: "Page", href: "/resume", keywords: ["cv"] },
+  { title: "Resume", kind: "Page", href: "/resume", keywords: ["cv"] },
   { title: "envguard", kind: "Case study", href: "/work/envguard", keywords: ["Go"] },
 ];
 
@@ -23,8 +23,8 @@ describe("rank", () => {
   });
 
   it("ignores case and accents", () => {
-    expect(rank(entries, "resume")[0]!.href).toBe("/resume");
-    expect(rank(entries, "RÉSUMÉ")[0]!.href).toBe("/resume");
+    expect(rank(entries, "RESUME")[0]!.href).toBe("/resume");
+    expect(rank(entries, "résumé")[0]!.href).toBe("/resume");
     expect(rank(entries, "CV")[0]!.href).toBe("/resume");
   });
 

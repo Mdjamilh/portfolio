@@ -7,7 +7,7 @@ const entries: Entry[] = [
   { title: "Selected work", kind: "Section", href: "/#work" },
   { title: "Index of projects", kind: "Section", href: "/#index" },
   { title: "About", kind: "Section", href: "/#about", keywords: ["principles", "skills"] },
-  { title: "Résumé", kind: "Page", href: "/resume", keywords: ["cv", "resume", "education", "print"] },
+  { title: "Resume", kind: "Page", href: "/resume", keywords: ["cv", "resume", "education", "print"] },
   ...projects.map((p) => ({ title: p.title, kind: "Case study", href: `/work/${p.slug}`, keywords: [p.slug, p.domain, ...p.stack] })),
   ...projects.filter((p) => p.live).map((p) => ({ title: p.title, kind: p.live!.includes("github.com") ? "Download" : "Live demo", href: p.live!, keywords: [p.slug, "demo", "live"] })),
   { title: "GitHub profile", kind: "External", href: profile.github, keywords: ["source", "code", "repositories"] },
