@@ -3,6 +3,8 @@ export interface Entry {
   /** Shown beside the title, e.g. "Case study" or "Live demo". */
   kind: string;
   href: string;
+  /** Other names that should rank like the title, such as a repository name. */
+  aliases?: string[];
   /** Extra words that should find this entry, such as its stack. */
   keywords?: string[];
 }
@@ -23,7 +25,7 @@ export function rank(entries: Entry[], query: string, limit = 12): Entry[] {
   if (words.length === 0) return entries.slice(0, limit);
   const scored: { entry: Entry; score: number; index: number }[] = [];
   entries.forEach((entry, index) => {
-    const title = normalize(entry.title);
+    const title = normalize([entry.title, ...(entry.aliases ?? [])].join(" "));
     const titleWords = title.split(/[^a-z0-9]+/);
     const rest = normalize([entry.kind, ...(entry.keywords ?? [])].join(" "));
     let score = 0;

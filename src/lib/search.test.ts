@@ -4,7 +4,7 @@ import { rank, type Entry } from "./search";
 
 const entries: Entry[] = [
   { title: "Clinic appointment scheduler", kind: "Case study", href: "/work/clinic", keywords: ["Next.js", "FHIR R4"] },
-  { title: "Patient record explorer", kind: "Case study", href: "/work/fhir", keywords: ["fhir-patient-explorer", "FHIR R4"] },
+  { title: "Patient record explorer", kind: "Case study", href: "/work/fhir", aliases: ["fhir-patient-explorer"], keywords: ["FHIR R4"] },
   { title: "Resume", kind: "Page", href: "/resume", keywords: ["cv"] },
   { title: "envguard", kind: "Case study", href: "/work/envguard", keywords: ["Go"] },
 ];
@@ -16,7 +16,8 @@ describe("rank", () => {
   });
 
   it("requires every word and ranks title matches above keyword matches", () => {
-    expect(rank(entries, "fhir").map((e) => e.href)).toEqual(["/work/clinic", "/work/fhir"]);
+    // The repository name counts like the title, so the FHIR project leads.
+    expect(rank(entries, "fhir").map((e) => e.href)).toEqual(["/work/fhir", "/work/clinic"]);
     expect(rank(entries, "patient fhir").map((e) => e.href)).toEqual(["/work/fhir"]);
     expect(rank(entries, "record").map((e) => e.href)).toEqual(["/work/fhir"]);
     expect(rank(entries, "explorer fhir")[0]!.href).toBe("/work/fhir");
