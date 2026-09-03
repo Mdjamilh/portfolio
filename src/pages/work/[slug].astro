@@ -147,9 +147,12 @@ const liveLabel = p.live?.includes("github.com") ? "Download a release" : "Open 
   }
 
   .head {
-    max-width: 52rem;
     padding: 3rem 0 3.5rem;
     border-bottom: 1px solid var(--rule);
+  }
+
+  .head > * {
+    max-width: 52rem;
   }
 
   .domain {
@@ -266,8 +269,7 @@ const liveLabel = p.live?.includes("github.com") ? "Download a release" : "Open 
     align-self: start;
     position: sticky;
     top: 5.5rem;
-    padding-top: 1rem;
-    border-top: 2px solid var(--ink);
+    padding-top: 0.25rem;
   }
 
   .facts dl {
