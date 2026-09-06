@@ -1,0 +1,97 @@
+{
+  "clinic-appointment-scheduler": {
+    "commits": 46,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:31:16Z"
+  },
+  "care-note-ai": {
+    "commits": 70,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:28:33Z"
+  },
+  "guideline-rag-search": {
+    "commits": 74,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:33:13Z"
+  },
+  "fhir-patient-explorer": {
+    "commits": 60,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:09:56Z"
+  },
+  "rx-interaction-checker": {
+    "commits": 40,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T17:15:32Z"
+  },
+  "medtrack-api": {
+    "commits": 51,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:14:15Z"
+  },
+  "hl7-parser-ts": {
+    "commits": 45,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:14:13Z"
+  },
+  "realtime-kanban": {
+    "commits": 58,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T08:14:17Z"
+  },
+  "budget-tracker": {
+    "commits": 52,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T07:58:16Z"
+  },
+  "snip-links": {
+    "commits": 40,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T15:35:37Z"
+  },
+  "envguard-cli": {
+    "commits": 42,
+    "language": "Go",
+    "pushedAt": "2026-10-23T13:09:25Z"
+  },
+  "gitpulse": {
+    "commits": 39,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T17:45:20Z"
+  },
+  "md-notes": {
+    "commits": null,
+    "language": null,
+    "pushedAt": null
+  },
+  "weather-commute": {
+    "commits": null,
+    "language": null,
+    "pushedAt": null
+  },
+  "job-tracker": {
+    "commits": null,
+    "language": null,
+    "pushedAt": null
+  },
+  "pomodoro-focus": {
+    "commits": null,
+    "language": null,
+    "pushedAt": null
+  },
+  "ui-kit": {
+    "commits": null,
+    "language": null,
+    "pushedAt": null
+  },
+  "dsa-in-typescript": {
+    "commits": 52,
+    "language": "TypeScript",
+    "pushedAt": "2026-10-23T17:47:30Z"
+  },
+  "e2e-testing-lab": {
+    "commits": null,
+    "language": null,
+    "pushedAt": null
+  }
+}

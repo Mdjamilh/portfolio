@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { lastPage, monthYear, repoFacts, totals } from "./github";
+import { lastPage, monthYear, repoFacts, totals, withSnapshot } from "./github";
 
 const json = (body: unknown, init: ResponseInit = {}) => new Response(JSON.stringify(body), { status: 200, ...init });
 
@@ -55,5 +55,22 @@ describe("monthYear", () => {
   it("formats in UTC so the month never shifts with the build machine's zone", () => {
     expect(monthYear("2026-10-31T23:30:00Z")).toBe("October 2026");
     expect(monthYear(null)).toBe("");
+  });
+});
+
+describe("withSnapshot", () => {
+  it("fills only the figures the API could not provide", () => {
+    const live = new Map([
+      ["a", { commits: 50, language: "Go", pushedAt: "2026-10-23T00:00:00Z" }],
+      ["b", { commits: null, language: null, pushedAt: null }],
+      ["c", { commits: null, language: null, pushedAt: null }],
+    ]);
+    const merged = withSnapshot(live, {
+      a: { commits: 40, language: "Go", pushedAt: "2026-10-01T00:00:00Z" },
+      b: { commits: 42, language: "TypeScript", pushedAt: "2026-10-22T00:00:00Z" },
+    });
+    expect(merged.get("a")!.commits).toBe(50);
+    expect(merged.get("b")).toEqual({ commits: 42, language: "TypeScript", pushedAt: "2026-10-22T00:00:00Z" });
+    expect(merged.get("c")!.commits).toBeNull();
   });
 });

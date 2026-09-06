@@ -77,10 +77,26 @@ export function monthYear(iso: string | null): string {
   return new Date(iso).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
+/** Fills anything the API couldn't answer from the last saved snapshot. */
+export function withSnapshot(facts: Map<string, RepoFacts>, snapshot: Record<string, RepoFacts>): Map<string, RepoFacts> {
+  for (const [repo, f] of facts) {
+    const saved = snapshot[repo];
+    if (!saved) continue;
+    facts.set(repo, {
+      commits: f.commits ?? saved.commits,
+      language: f.language ?? saved.language,
+      pushedAt: f.pushedAt ?? saved.pushedAt,
+    });
+  }
+  return facts;
+}
+
 let shared: Promise<Map<string, RepoFacts>> | undefined;
 
 /** One request set per build, shared by every page that shows figures. */
 export function buildFacts(user: string, repos: string[]): Promise<Map<string, RepoFacts>> {
-  shared ??= repoFacts(user, repos);
+  shared ??= Promise.all([repoFacts(user, repos), import("../data/snapshot.json").then((m) => m.default as Record<string, RepoFacts>)]).then(([facts, snapshot]) =>
+    withSnapshot(facts, snapshot),
+  );
   return shared;
 }
