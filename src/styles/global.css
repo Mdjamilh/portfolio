@@ -1,65 +1,61 @@
-@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/space-grotesk";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
 
 /*
- * An editorial system: warm paper and ink, one accent, serif display type,
- * hairline rules instead of boxes and shadows.
+ * Blueprint: deep navy drafting sheet, a faint engineering grid, cyan for
+ * anything live or interactive, amber for annotations. The light theme is
+ * the same drawing on white drafting paper.
  */
 :root {
-  --paper: #f5f2ea;
-  --paper-raised: #fbf9f4;
-  --ink: #141c24;
-  --ink-soft: #3a4450;
-  --muted: #5d6672;
-  --rule: #d8d1c3;
-  --rule-strong: #b9b09f;
-  --accent: #1f5a4e;
-  --accent-soft: #e2ece7;
-  --marker: #8c5f12;
-  --focus: #1f5a4e;
+  --bg: #07111f;
+  --bg-raised: #0c1a2e;
+  --bg-panel: rgb(12 26 46 / 0.72);
+  --ink: #e7eef8;
+  --ink-soft: #b4c2d6;
+  --muted: #8296b3;
+  --line: rgb(120 170 230 / 0.16);
+  --line-strong: rgb(120 170 230 / 0.32);
+  --grid: rgb(94 160 255 / 0.07);
+  --grid-major: rgb(94 160 255 / 0.12);
+  --accent: #5fd4ff;
+  --accent-ink: #04121f;
+  --accent-glow: rgb(95 212 255 / 0.35);
+  --accent-soft: rgb(95 212 255 / 0.1);
+  --note: #ffbf5e;
+  --ok: #6be3a4;
+  --shadow: 0 30px 80px -30px rgb(0 0 0 / 0.7);
 
-  --serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
+  --display: "Space Grotesk Variable", "Segoe UI", system-ui, sans-serif;
   --sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", monospace;
 
-  --measure: 68ch;
-  --rail: 15rem;
-  --gutter: clamp(1rem, 4vw, 3rem);
+  --measure: 66ch;
+  --max: 76rem;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
 
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #11161c;
-    --paper-raised: #171d24;
-    --ink: #ece7dd;
-    --ink-soft: #cfc9be;
-    --muted: #9aa3ad;
-    --rule: #2a323c;
-    --rule-strong: #3d4753;
-    --accent: #84c7b5;
-    --accent-soft: #1b2b28;
-    --marker: #d9ad5c;
-    --focus: #84c7b5;
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --paper: #11161c;
-  --paper-raised: #171d24;
-  --ink: #ece7dd;
-  --ink-soft: #cfc9be;
-  --muted: #9aa3ad;
-  --rule: #2a323c;
-  --rule-strong: #3d4753;
-  --accent: #84c7b5;
-  --accent-soft: #1b2b28;
-  --marker: #d9ad5c;
-  --focus: #84c7b5;
   color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f7fb;
+  --bg-raised: #ffffff;
+  --bg-panel: rgb(255 255 255 / 0.8);
+  --ink: #0b1a2e;
+  --ink-soft: #33465f;
+  --muted: #56698a;
+  --line: rgb(30 80 160 / 0.14);
+  --line-strong: rgb(30 80 160 / 0.3);
+  --grid: rgb(30 100 220 / 0.06);
+  --grid-major: rgb(30 100 220 / 0.1);
+  --accent: #0b6bcb;
+  --accent-ink: #ffffff;
+  --accent-glow: rgb(11 107 203 / 0.25);
+  --accent-soft: rgb(11 107 203 / 0.08);
+  --note: #9a5b00;
+  --ok: #0f7a4a;
+  --shadow: 0 30px 70px -35px rgb(20 50 90 / 0.35);
+  color-scheme: light;
 }
 
 *,
@@ -69,41 +65,41 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
   -webkit-text-size-adjust: 100%;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
 }
 
 body {
   margin: 0;
-  background: var(--paper);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+  /* The drafting grid: fine lines every 24px, stronger every 120px. */
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position: -1px -1px;
   color: var(--ink);
   font-family: var(--sans);
   font-size: 1rem;
   line-height: 1.6;
-  font-feature-settings: "cv11", "ss01";
   text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-family: var(--display);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
@@ -113,10 +109,11 @@ p {
 
 a {
   color: inherit;
-  text-decoration-color: var(--rule-strong);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-  transition: text-decoration-color 0.15s, color 0.15s;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 0.22em;
+  transition:
+    color 0.15s,
+    text-decoration-color 0.15s;
 }
 
 a:hover {
@@ -125,14 +122,14 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
 ::selection {
   background: var(--accent);
-  color: var(--paper);
+  color: var(--accent-ink);
 }
 
 .skip {
@@ -141,8 +138,8 @@ a:hover {
   top: -3rem;
   z-index: 50;
   padding: 0.5rem 0.9rem;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
   border-radius: 4px;
 }
 
@@ -159,105 +156,190 @@ a:hover {
   white-space: nowrap;
 }
 
-/* Small caps label used for section numbers, metadata and table headers. */
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* Technical labels: mono, spaced capitals. */
 .label {
   font-family: var(--mono);
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-.rule {
-  border: 0;
-  border-top: 1px solid var(--rule);
-  margin: 0;
+.label.note {
+  color: var(--note);
+}
+
+/* Page title block used by every page except home. */
+.page-head {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.5rem;
+}
+
+.page-head .label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--note);
+}
+
+.page-head .label::after {
+  content: "";
+  flex: 0 0 4rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.page-head h1 {
+  margin-top: 1rem;
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+}
+
+.page-head p.lede {
+  max-width: 58ch;
+  margin-top: 1.1rem;
+  font-size: 1.12rem;
+  color: var(--ink-soft);
+}
+
+/* A panel with blueprint corner marks. */
+.panel {
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(6px);
+}
+
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--accent);
+  border-style: solid;
+  pointer-events: none;
+  transition:
+    width 0.3s,
+    height 0.3s;
+}
+
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+
+.panel::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 2px 2px 0;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 0.9rem;
+  gap: 0.4rem;
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+.tags li {
+  padding: 0.18rem 0.55rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
   font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--muted);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
 }
 
 .button {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  background: var(--ink);
-  color: var(--paper);
-  font: 500 0.9rem/1.2 var(--sans);
+  gap: 0.55rem;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 600 0.9rem/1.2 var(--sans);
   text-decoration: none;
   cursor: pointer;
+  transition:
+    box-shadow 0.2s,
+    background 0.2s,
+    color 0.2s;
 }
 
 .button:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--paper);
+  color: var(--accent-ink);
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 0 30px var(--accent-glow);
 }
 
 .button.quiet {
   background: transparent;
   color: var(--ink);
-  border-color: var(--rule-strong);
+  border-color: var(--line-strong);
 }
 
 .button.quiet:hover {
-  border-color: var(--accent);
   color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.arrow::after {
+  content: "→";
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+a:hover .arrow::after,
+.arrow:hover::after {
+  transform: translateX(3px);
 }
 
 kbd {
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   padding: 0.05rem 0.35rem;
-  border: 1px solid var(--rule-strong);
+  border: 1px solid var(--line-strong);
   border-bottom-width: 2px;
   border-radius: 3px;
   color: var(--muted);
 }
 
-/* Numbered section headings, set like a report. */
-.section-head {
-  display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr);
-  column-gap: 1.5rem;
-  align-items: baseline;
-  margin-bottom: 2rem;
+/* Elements fade up once as they enter the view; only when scripts run, so nothing is ever hidden without them. */
+:root.js .reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 }
 
-.section-head .label {
-  margin: 0;
-  color: var(--marker);
+:root.js .reveal.in {
+  opacity: 1;
+  transform: none;
 }
 
-.section-head h2 {
-  font-size: clamp(2rem, 4.5vw, 3rem);
-}
-
-.section-head .lede {
-  grid-column: 2;
-  max-width: 60ch;
-  margin: 0.75rem 0 0;
-  color: var(--ink-soft);
-}
-
-@media (max-width: 760px) {
-  .section-head {
-    grid-template-columns: 1fr;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
-  .section-head .lede {
-    grid-column: 1;
+  :root.js .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
