@@ -1,0 +1,260 @@
+---
+import { Image } from "astro:assets";
+import { repoUrl, type Project } from "../data/projects";
+import { shotFor } from "../lib/shots";
+
+interface Props {
+  project: Project;
+  number: number;
+  commits?: number | null;
+  /** Put the screenshot on the left instead of the right. */
+  flip?: boolean;
+  headingLevel?: 2 | 3;
+}
+
+const { project: p, number, commits, flip = false, headingLevel = 3 } = Astro.props;
+const shot = shotFor(p.slug);
+const host = p.live ? new URL(p.live).host : `github.com/Mdjamilh/${p.slug}`;
+const isRelease = p.live?.includes("github.com");
+const Heading = `h${headingLevel}` as "h2" | "h3";
+---
+
+<article class:list={["sheet panel reveal", { flip, "no-shot": !shot }]}>
+  <div class="spec">
+    <p class="label note">Spec {String(number).padStart(2, "0")} · {p.domain}</p>
+    <Heading class="title">
+      <a href={`/projects/${p.slug}`}>{p.title}</a>
+    </Heading>
+    <p class="summary">{p.summary}</p>
+    <dl class="table">
+      <div>
+        <dt class="label">Stack</dt>
+        <dd>{p.stack.slice(0, 4).join(" · ")}</dd>
+      </div>
+      <div>
+        <dt class="label">Verified by</dt>
+        <dd>{p.evidence[0]}</dd>
+      </div>
+      <div>
+        <dt class="label">Status</dt>
+        <dd class="status">
+          <span class:list={["dot", { live: p.live && !isRelease }]} aria-hidden="true"></span>
+          {p.live ? (isRelease ? "Released" : "Live") : "Source available"}
+          {commits != null && <span class="commits"> · {commits} commits</span>}
+        </dd>
+      </div>
+    </dl>
+    <div class="actions">
+      <a class="button" href={`/projects/${p.slug}`}><span class="arrow">Case study </span></a>
+      {p.live && <a class="button quiet" href={p.live}>{isRelease ? "Download" : "Live demo"}</a>}
+      <a class="button quiet" href={repoUrl(p.slug)}>Source</a>
+    </div>
+  </div>
+
+  {
+    shot && (
+      <a class="frame" href={p.live && !isRelease ? p.live : `/projects/${p.slug}`} tabindex="-1" aria-hidden="true">
+        <span class="chrome">
+          <span class="dots">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span class="url">{host}</span>
+        </span>
+        <Image src={shot} alt="" widths={[640, 960, 1280]} sizes="(max-width: 860px) 100vw, 640px" loading="lazy" />
+      </a>
+    )
+  }
+</article>
+
+<style>
+  .sheet {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas: "spec frame";
+    gap: 2.5rem;
+    align-items: center;
+    padding: 2rem;
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s;
+  }
+
+  .sheet.flip {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas: "frame spec";
+  }
+
+  .sheet.no-shot {
+    grid-template-columns: 1fr;
+    grid-template-areas: "spec";
+  }
+
+  .sheet:hover,
+  .sheet:focus-within {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+  }
+
+  .sheet:hover::before,
+  .sheet:hover::after,
+  .sheet:focus-within::before,
+  .sheet:focus-within::after {
+    width: 28px;
+    height: 28px;
+  }
+
+  .spec {
+    grid-area: spec;
+  }
+
+  .title {
+    margin: 0.7rem 0 0.75rem;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+  }
+
+  .title a {
+    text-decoration: none;
+  }
+
+  .summary {
+    color: var(--ink-soft);
+  }
+
+  .table {
+    margin: 1.25rem 0 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .table div {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.88rem;
+  }
+
+  .table dt {
+    padding-top: 0.15rem;
+  }
+
+  .table dd {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .dot.live {
+    background: var(--ok);
+    box-shadow: 0 0 0 0 var(--ok);
+    animation: beacon 2.4s infinite;
+  }
+
+  .commits {
+    color: var(--muted);
+  }
+
+  @keyframes beacon {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 7px transparent;
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .frame {
+    grid-area: frame;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--bg-raised);
+    transform: perspective(1400px) rotateY(0deg);
+    transition: transform 0.5s ease;
+  }
+
+  .sheet:hover .frame {
+    transform: perspective(1400px) rotateY(-2deg) translateY(-4px);
+  }
+
+  .sheet.flip:hover .frame {
+    transform: perspective(1400px) rotateY(2deg) translateY(-4px);
+  }
+
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dots {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .dots i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line-strong);
+  }
+
+  .url {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0.15rem 0.6rem;
+    border-radius: 3px;
+    background: var(--bg);
+    font: 0.7rem var(--mono);
+    color: var(--muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .frame :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  @media (max-width: 860px) {
+    .sheet,
+    .sheet.flip {
+      grid-template-columns: 1fr;
+      grid-template-areas: "frame" "spec";
+      gap: 1.5rem;
+      padding: 1.25rem;
+    }
+    .table div {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+    }
+  }
+</style>
