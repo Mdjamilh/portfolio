@@ -1,9 +1,8 @@
 ---
 import Base from "../layouts/Base.astro";
-import Hero from "../components/Hero.astro";
-import SelectedWork from "../components/SelectedWork.astro";
-import ProjectIndex from "../components/ProjectIndex.astro";
-import About from "../components/About.astro";
+import SystemDiagram from "../components/SystemDiagram.astro";
+import SpecSheet from "../components/SpecSheet.astro";
+import { profile } from "../data/profile";
 import { GITHUB_USER, projects } from "../data/projects";
 import { buildFacts, totals } from "../lib/github";
 
@@ -11,11 +10,171 @@ const facts = await buildFacts(
   GITHUB_USER,
   projects.map((p) => p.slug),
 );
+const figures = totals(facts);
+const live = projects.filter((p) => p.live && !p.live.includes("github.com")).length;
+const featured = ["clinic-appointment-scheduler", "realtime-kanban", "budget-tracker"].map((slug) => projects.find((p) => p.slug === slug)!);
 ---
 
 <Base>
-  <Hero figures={totals(facts)} />
-  <SelectedWork />
-  <ProjectIndex facts={facts} />
-  <About />
+  <section class="hero wrap" aria-labelledby="name">
+    <p class="label sheet-no">Portfolio · Sheet 01 of 04</p>
+    <h1 id="name">
+      {profile.name.split(" ").slice(0, -1).join(" ")} <span class="last">{profile.name.split(" ").at(-1)}</span>
+    </h1>
+    <p class="tagline">{profile.focus}</p>
+    <p class="intro">{profile.abstract}</p>
+    <div class="cta">
+      <a class="button" href="/projects"><span class="arrow">View projects </span></a>
+      <a class="button quiet" href="/resume">Resume</a>
+      <a class="button quiet" href={profile.github}>GitHub</a>
+    </div>
+
+    <SystemDiagram />
+
+    <dl class="figures" aria-label="At a glance">
+      <div>
+        <dt class="label">Repositories</dt>
+        <dd>{figures.repositories}</dd>
+      </div>
+      {
+        figures.commits !== null && (
+          <div>
+            <dt class="label">Commits</dt>
+            <dd>{figures.commits.toLocaleString("en-GB")}</dd>
+          </div>
+        )
+      }
+      <div>
+        <dt class="label">Live demos</dt>
+        <dd>{live}</dd>
+      </div>
+      <div>
+        <dt class="label">Areas</dt>
+        <dd>{new Set(projects.map((p) => p.domain)).size}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="featured wrap" aria-labelledby="featured-title">
+    <div class="head">
+      <h2 id="featured-title"><span class="label note">Featured</span> Selected work</h2>
+      <a href="/projects" class="all"><span class="arrow">All {projects.length} projects </span></a>
+    </div>
+    <div class="sheets">
+      {featured.map((p, i) => <SpecSheet project={p} number={i + 1} commits={facts.get(p.slug)?.commits} flip={i % 2 === 1} />)}
+    </div>
+  </section>
 </Base>
+
+<style>
+  .hero {
+    padding-top: clamp(3.5rem, 9vw, 6.5rem);
+  }
+
+  .sheet-no {
+    color: var(--note);
+  }
+
+  h1 {
+    margin-top: 1.1rem;
+    font-size: clamp(3rem, 9.5vw, 7.5rem);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  .last {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--accent);
+    text-shadow: 0 0 40px var(--accent-glow);
+  }
+
+  .tagline {
+    margin-top: 1.4rem;
+    font: 500 clamp(1.15rem, 2.2vw, 1.5rem) / 1.35 var(--display);
+    color: var(--accent);
+  }
+
+  .intro {
+    max-width: 60ch;
+    margin-top: 0.9rem;
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    color: var(--ink-soft);
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin: 2rem 0 3.5rem;
+  }
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    margin: 2rem 0 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .figures div {
+    padding: 1.2rem 1rem 1.3rem 0;
+  }
+
+  .figures div + div {
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--line);
+  }
+
+  .figures dd {
+    margin: 0.35rem 0 0;
+    font: 600 clamp(2rem, 4vw, 2.8rem) / 1 var(--display);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .featured {
+    padding-top: 5.5rem;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .head h2 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  }
+
+  .all {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--accent);
+  }
+
+  .sheets {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  @media (max-width: 560px) {
+    .figures div + div {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .figures div {
+      border-top: 1px solid var(--line);
+    }
+    .figures div:first-child {
+      border-top: 0;
+    }
+  }
+</style>
