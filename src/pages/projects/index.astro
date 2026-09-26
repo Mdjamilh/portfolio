@@ -1,0 +1,305 @@
+---
+import { Image } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import SpecSheet from "../../components/SpecSheet.astro";
+import { domains, GITHUB_USER, projects, repoUrl } from "../../data/projects";
+import { buildFacts, monthYear } from "../../lib/github";
+import { shotFor } from "../../lib/shots";
+
+const facts = await buildFacts(
+  GITHUB_USER,
+  projects.map((p) => p.slug),
+);
+const selected = projects.filter((p) => p.selected);
+const more = projects.filter((p) => !p.selected);
+---
+
+<Base title="Projects" description="Every public project, with case studies, live demos and source code.">
+  <div class="wrap">
+    <header class="page-head">
+      <p class="label">Sheet 02 · Projects</p>
+      <h1>Projects</h1>
+      <p class="lede">
+        {projects.length} public projects across web applications, developer tooling and healthcare, each with its source, tests and continuous integration public on GitHub.
+      </p>
+    </header>
+
+    <section aria-labelledby="selected-title">
+      <h2 id="selected-title" class="section-title"><span class="label note">Part A</span> Selected</h2>
+      <div class="sheets">
+        {selected.map((p, i) => <SpecSheet project={p} number={i + 1} commits={facts.get(p.slug)?.commits} flip={i % 2 === 1} />)}
+      </div>
+    </section>
+
+    <section class="more" aria-labelledby="more-title">
+      <div class="more-head">
+        <h2 id="more-title" class="section-title"><span class="label note">Part B</span> More projects</h2>
+        <div class="filters" data-filters hidden>
+          <fieldset>
+            <legend class="visually-hidden">Filter by domain</legend>
+            <label><input type="radio" name="domain" value="" checked /> All</label>
+            {
+              domains.map((d) => (
+                <label>
+                  <input type="radio" name="domain" value={d} /> {d}
+                </label>
+              ))
+            }
+          </fieldset>
+          <label class="query">
+            <span class="visually-hidden">Filter by name or technology</span>
+            <input type="search" placeholder="Filter by technology" data-query />
+          </label>
+        </div>
+      </div>
+      <p class="count label" aria-live="polite" data-count>{more.length} projects</p>
+
+      <ul class="grid">
+        {
+          more.map((p) => {
+            const shot = shotFor(p.slug);
+            const f = facts.get(p.slug);
+            return (
+              <li class="card panel reveal" data-domain={p.domain} data-search={[p.title, p.slug, p.summary, ...p.stack].join(" ").toLowerCase()}>
+                {shot ? (
+                  <Image class="thumb" src={shot} alt="" widths={[480, 720]} sizes="(max-width: 700px) 100vw, 380px" loading="lazy" />
+                ) : (
+                  <div class="thumb blank" aria-hidden="true">
+                    <span>{p.stack[0]}</span>
+                  </div>
+                )}
+                <div class="card-body">
+                  <p class="label">{p.domain}</p>
+                  <h3>
+                    <a href={`/projects/${p.slug}`}>{p.title}</a>
+                  </h3>
+                  <p class="summary">{p.summary}</p>
+                  <ul class="tags">
+                    {p.stack.slice(0, 3).map((s) => (
+                      <li>{s}</li>
+                    ))}
+                  </ul>
+                  <p class="meta label">
+                    {f?.commits != null ? `${f.commits} commits` : "New"}
+                    {f?.pushedAt && ` · ${monthYear(f.pushedAt)}`}
+                  </p>
+                  <p class="links">
+                    {p.live && <a href={p.live}>{p.live.includes("github.com") ? "Download" : "Live demo"}</a>}
+                    <a href={repoUrl(p.slug)}>Source</a>
+                  </p>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <p class="none" data-none hidden>No project matches that filter.</p>
+    </section>
+  </div>
+</Base>
+
+<script>
+  import { matchesFilter } from "../../lib/filter";
+
+  const filters = document.querySelector<HTMLElement>("[data-filters]")!;
+  const query = document.querySelector<HTMLInputElement>("[data-query]")!;
+  const count = document.querySelector<HTMLElement>("[data-count]")!;
+  const none = document.querySelector<HTMLElement>("[data-none]")!;
+  const cards = [...document.querySelectorAll<HTMLElement>(".grid > li")];
+  filters.hidden = false;
+
+  function apply() {
+    const domain = filters.querySelector<HTMLInputElement>('input[name="domain"]:checked')?.value ?? "";
+    let shown = 0;
+    for (const card of cards) {
+      const visible = matchesFilter({ domain: card.dataset.domain!, text: card.dataset.search! }, domain, query.value);
+      card.hidden = !visible;
+      if (visible) shown++;
+    }
+    count.textContent = shown === cards.length ? `${cards.length} projects` : `${shown} of ${cards.length} projects`;
+    none.hidden = shown > 0;
+  }
+
+  filters.addEventListener("change", apply);
+  query.addEventListener("input", apply);
+</script>
+
+<style>
+  .section-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .sheets {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .more {
+    padding-top: 5rem;
+  }
+
+  .more-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  fieldset label {
+    position: relative;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    font: 0.78rem var(--mono);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  fieldset input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  fieldset label:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  fieldset label:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .query input {
+    width: 13rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    background: var(--bg);
+    color: var(--ink);
+    font: 0.85rem var(--sans);
+  }
+
+  .count {
+    margin: 0 0 1rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .grid > li[hidden] {
+    display: none;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition:
+      border-color 0.25s,
+      transform 0.25s,
+      box-shadow 0.25s;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--line-strong);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+
+  .thumb {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .blank {
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(135deg, var(--accent-soft), transparent 60%),
+      var(--bg);
+  }
+
+  .blank span {
+    font: 600 1.6rem var(--display);
+    color: var(--accent);
+    opacity: 0.8;
+  }
+
+  .card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.1rem 1.2rem 1.2rem;
+  }
+
+  h3 {
+    margin: 0.4rem 0 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  h3 a {
+    text-decoration: none;
+  }
+
+  .summary {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  .meta {
+    margin: 0.9rem 0 0.35rem;
+  }
+
+  .links {
+    display: flex;
+    gap: 1rem;
+    margin: auto 0 0;
+    padding-top: 0.5rem;
+    font-size: 0.88rem;
+  }
+
+  .none {
+    color: var(--muted);
+  }
+</style>
