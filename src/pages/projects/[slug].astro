@@ -1,0 +1,340 @@
+---
+import type { GetStaticPaths } from "astro";
+import { Image } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import { GITHUB_USER, projects, repoUrl, type Project } from "../../data/projects";
+import { buildFacts, monthYear } from "../../lib/github";
+import { shotFor } from "../../lib/shots";
+
+export const getStaticPaths = (() =>
+  projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: { project, number: i + 1, previous: projects[i - 1], next: projects[i + 1] },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+  number: number;
+  previous?: Project;
+  next?: Project;
+}
+
+const { project: p, number, previous, next } = Astro.props;
+const facts = (
+  await buildFacts(
+    GITHUB_USER,
+    projects.map((x) => x.slug),
+  )
+).get(p.slug);
+const shot = shotFor(p.slug);
+const isRelease = p.live?.includes("github.com");
+---
+
+<Base title={p.title} description={p.summary}>
+  <article class="wrap">
+    <header class="page-head">
+      <nav class="crumbs label" aria-label="Breadcrumb">
+        <a href="/projects">Projects</a> <span aria-hidden="true">/</span> <span aria-current="page">Spec {String(number).padStart(2, "0")}</span>
+      </nav>
+      <p class="label domain">{p.domain}</p>
+      <h1>{p.title}</h1>
+      <p class="lede">{p.summary}</p>
+      <div class="actions">
+        {p.live && <a class="button" href={p.live}><span class="arrow">{isRelease ? "Download a release " : "Open the live demo "}</span></a>}
+        <a class="button quiet" href={repoUrl(p.slug)}>Read the source</a>
+      </div>
+    </header>
+
+    {
+      shot && (
+        <figure class="shot panel">
+          <Image src={shot} alt={`Screenshot of ${p.title}`} widths={[720, 1080, 1440]} sizes="(max-width: 1200px) 100vw, 1200px" />
+          <figcaption class="label">Fig. 1 · {p.live && !isRelease ? new URL(p.live).host : p.title}, captured from the live site</figcaption>
+        </figure>
+      )
+    }
+
+    <div class="layout">
+      <div class="main">
+        <section aria-labelledby="problem">
+          <h2 id="problem"><span class="label note">01</span> Problem</h2>
+          <p class="lead">{p.problem}</p>
+        </section>
+
+        <section aria-labelledby="approach">
+          <h2 id="approach"><span class="label note">02</span> Approach</h2>
+          <ol class="steps">
+            {p.approach.map((a) => <li>{a}</li>)}
+          </ol>
+        </section>
+
+        <section aria-labelledby="evidence">
+          <h2 id="evidence"><span class="label note">03</span> Evidence</h2>
+          <ul class="evidence">
+            {p.evidence.map((e) => <li>{e}</li>)}
+          </ul>
+          <p class="note">The repository README explains how to run each test suite, and its continuous integration history is public.</p>
+        </section>
+      </div>
+
+      <aside class="facts panel" aria-label="Project facts">
+        <dl>
+          <div>
+            <dt class="label">Stack</dt>
+            <dd>
+              <ul class="tags">
+                {p.stack.map((s) => <li>{s}</li>)}
+              </ul>
+            </dd>
+          </div>
+          {
+            facts?.commits != null && (
+              <div>
+                <dt class="label">Commits</dt>
+                <dd class="figure">{facts.commits}</dd>
+              </div>
+            )
+          }
+          {
+            facts?.pushedAt && (
+              <div>
+                <dt class="label">Last change</dt>
+                <dd>{monthYear(facts.pushedAt)}</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt class="label">Repository</dt>
+            <dd>
+              <a href={repoUrl(p.slug)}>
+                {GITHUB_USER}/{p.slug}
+              </a>
+            </dd>
+          </div>
+          {
+            p.live && (
+              <div>
+                <dt class="label">{isRelease ? "Releases" : "Live"}</dt>
+                <dd>
+                  <a href={p.live}>{p.live.replace(/^https:\/\//, "")}</a>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+      </aside>
+    </div>
+
+    <nav class="pager" aria-label="More projects">
+      {
+        previous ? (
+          <a href={`/projects/${previous.slug}`} rel="prev" class="panel">
+            <span class="label">← Previous</span>
+            {previous.title}
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a href={`/projects/${next.slug}`} rel="next" class="panel next">
+            <span class="label">Next →</span>
+            {next.title}
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .crumbs {
+    margin-bottom: 1.5rem;
+  }
+
+  .crumbs a {
+    color: var(--accent);
+  }
+
+  .page-head .crumbs::after {
+    content: none;
+  }
+
+  .domain {
+    margin: 0;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 1.75rem;
+  }
+
+  .shot {
+    margin: 0 0 3.5rem;
+    padding: 0.6rem;
+  }
+
+  .shot :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 38rem;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid var(--line);
+  }
+
+  .shot figcaption {
+    padding: 0.7rem 0.2rem 0.1rem;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18rem;
+    gap: 4rem;
+  }
+
+  .main section + section {
+    margin-top: 3rem;
+  }
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+  }
+
+  .lead {
+    max-width: var(--measure);
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+  }
+
+  .steps {
+    max-width: var(--measure);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .steps li {
+    position: relative;
+    padding: 1rem 0 1rem 2.75rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    counter-increment: step;
+  }
+
+  .steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 1.05rem;
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    font: 500 0.7rem var(--mono);
+    color: var(--accent);
+  }
+
+  .evidence {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence li {
+    position: relative;
+    padding: 0.5rem 0 0.5rem 1.8rem;
+  }
+
+  .evidence li::before {
+    content: "";
+    position: absolute;
+    left: 0.2rem;
+    top: 0.95rem;
+    width: 0.7rem;
+    height: 0.38rem;
+    border-left: 2px solid var(--ok);
+    border-bottom: 2px solid var(--ok);
+    transform: rotate(-45deg);
+  }
+
+  .note {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .facts {
+    align-self: start;
+    position: sticky;
+    top: 5.5rem;
+    padding: 0.5rem 1.25rem;
+  }
+
+  .facts dl {
+    margin: 0;
+  }
+
+  .facts dl > div {
+    padding: 0.9rem 0;
+  }
+
+  .facts dl > div + div {
+    border-top: 1px solid var(--line);
+  }
+
+  .facts dd {
+    margin: 0.45rem 0 0;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+
+  .figure {
+    font: 600 2rem/1 var(--display) !important;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 5rem;
+  }
+
+  .pager a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.1rem 1.3rem;
+    font: 600 1.15rem var(--display);
+    text-decoration: none;
+  }
+
+  .pager .next {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .facts {
+      position: static;
+    }
+    .pager {
+      grid-template-columns: 1fr;
+    }
+    .pager .next {
+      grid-column: 1;
+    }
+  }
+</style>
