@@ -1,0 +1,184 @@
+---
+import Base from "../layouts/Base.astro";
+import { profile } from "../data/profile";
+---
+
+<Base title="About" description={`About ${profile.name}: how I work and the technologies I use.`}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="label">Sheet 03 · About</p>
+      <h1>About</h1>
+      <p class="lede">{profile.abstract}</p>
+    </header>
+
+    <div class="columns">
+      <section class="story" aria-labelledby="story-title">
+        <h2 id="story-title" class="label note">Background</h2>
+        {profile.about.map((p) => <p>{p}</p>)}
+      </section>
+
+      <section aria-labelledby="principles-title">
+        <h2 id="principles-title" class="label note">How I work</h2>
+        <ol class="principles">
+          {
+            profile.principles.map((p, i) => (
+              <li class="panel reveal">
+                <span class="label">P{i + 1}</span>
+                <strong>{p.title}</strong>
+                <span>{p.text}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+    </div>
+
+    {
+      profile.education.length > 0 && (
+        <section class="block" aria-labelledby="education-title">
+          <h2 id="education-title" class="label note">Education</h2>
+          <ul class="education">
+            {profile.education.map((e) => (
+              <li class="panel">
+                <strong>{e.programme}</strong>
+                <span>{e.institution}</span>
+                <span class="label">{e.period}</span>
+                {e.detail && <span>{e.detail}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="block" aria-labelledby="stack-title">
+      <h2 id="stack-title" class="label note">Technical specification</h2>
+      <table class="spec panel">
+        <caption class="visually-hidden">Technologies used across the projects, by area</caption>
+        <tbody>
+          {
+            profile.skills.map((s) => (
+              <tr>
+                <th scope="row">{s.group}</th>
+                <td>
+                  <ul class="tags">
+                    {s.items.map((i) => (
+                      <li>{i}</li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem 4rem;
+  }
+
+  h2.label {
+    margin-bottom: 1.1rem;
+    font-size: 0.75rem;
+  }
+
+  .story p {
+    max-width: var(--measure);
+    font-size: 1.06rem;
+    color: var(--ink-soft);
+  }
+
+  .principles {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .principles li {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.25rem 0.75rem;
+    padding: 1rem 1.15rem;
+  }
+
+  .principles .label {
+    grid-row: span 2;
+    color: var(--accent);
+    padding-top: 0.2rem;
+  }
+
+  .principles strong {
+    font-family: var(--display);
+    font-size: 1.08rem;
+  }
+
+  .principles li > span:last-child {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+  }
+
+  .block {
+    margin-top: 4.5rem;
+  }
+
+  .education {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .education li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .spec {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .spec th,
+  .spec td {
+    padding: 0.95rem 1.2rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .spec tr:last-child th,
+  .spec tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .spec th {
+    width: 14rem;
+    font: 600 0.95rem var(--display);
+  }
+
+  @media (max-width: 860px) {
+    .columns {
+      grid-template-columns: 1fr;
+    }
+    .spec th,
+    .spec td {
+      display: block;
+      width: auto;
+    }
+    .spec th {
+      padding-bottom: 0.2rem;
+      border-bottom: 0;
+    }
+  }
+</style>
