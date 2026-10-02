@@ -24,8 +24,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#f5f2ea" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#11161c" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#07111f" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -42,6 +41,27 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <CommandPalette />
   </body>
 </html>
+
+<script>
+  // Fade sections up once as they scroll into view.
+  const items = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px" },
+    );
+    items.forEach((el) => io.observe(el));
+  } else {
+    items.forEach((el) => el.classList.add("in"));
+  }
+</script>
 
 <style>
   main {

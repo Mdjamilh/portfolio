@@ -4,11 +4,11 @@ import { profile } from "../data/profile";
 import type { Entry } from "../lib/search";
 
 const entries: Entry[] = [
-  { title: "Selected work", kind: "Section", href: "/#work" },
-  { title: "Index of projects", kind: "Section", href: "/#index" },
-  { title: "About", kind: "Section", href: "/#about", keywords: ["principles", "skills"] },
-  { title: "Resume", kind: "Page", href: "/resume", keywords: ["cv", "resume", "education", "print"] },
-  ...projects.map((p) => ({ title: p.title, kind: "Case study", href: `/work/${p.slug}`, aliases: [p.slug], keywords: [p.domain, ...p.stack] })),
+  { title: "Home", kind: "Page", href: "/" },
+  { title: "Projects", kind: "Page", href: "/projects", keywords: ["work", "portfolio", "all"] },
+  { title: "About", kind: "Page", href: "/about", keywords: ["principles", "skills", "technologies", "education"] },
+  { title: "Resume", kind: "Page", href: "/resume", keywords: ["cv", "pdf"] },
+  ...projects.map((p) => ({ title: p.title, kind: "Case study", href: `/projects/${p.slug}`, aliases: [p.slug], keywords: [p.domain, ...p.stack] })),
   ...projects.filter((p) => p.live).map((p) => ({ title: p.title, kind: p.live!.includes("github.com") ? "Download" : "Live demo", href: p.live!, aliases: [p.slug], keywords: ["demo", "live"] })),
   { title: "GitHub profile", kind: "External", href: profile.github, keywords: ["source", "code", "repositories"] },
   { title: "Source of this site", kind: "External", href: repoUrl("portfolio"), keywords: ["code"] },
@@ -137,15 +137,16 @@ const entries: Entry[] = [
     width: min(36rem, calc(100vw - 2rem));
     margin: 12vh auto auto;
     padding: 0;
-    border: 1px solid var(--rule-strong);
+    border: 1px solid var(--line-strong);
     border-radius: 4px;
-    background: var(--paper-raised);
+    background: var(--bg-raised);
     color: var(--ink);
     box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.35);
   }
 
   .palette::backdrop {
-    background: rgb(10 14 18 / 0.45);
+    background: rgb(2 8 16 / 0.6);
+    backdrop-filter: blur(3px);
   }
 
   form {
@@ -153,7 +154,7 @@ const entries: Entry[] = [
     align-items: center;
     gap: 0.75rem;
     padding: 0.4rem 1rem;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--line);
   }
 
   input {
@@ -206,6 +207,6 @@ const entries: Entry[] = [
   .hint {
     margin: 0;
     padding: 0.55rem 1rem;
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--line);
   }
 </style>
