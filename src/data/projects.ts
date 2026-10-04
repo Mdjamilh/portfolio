@@ -67,7 +67,6 @@ export const projects: Project[] = [
     evidence: ["Retrieval evaluation in CI", "Every answer linked to its source passage", "Runs locally with Ollama"],
     stack: ["TypeScript", "PostgreSQL", "pgvector", "Ollama", "RAG"],
     live: "https://guideline-rag-search.vercel.app",
-    selected: true,
   },
   {
     slug: "fhir-patient-explorer",
@@ -159,6 +158,7 @@ export const projects: Project[] = [
     evidence: ["Tests for import and budgeting rules", "Works offline", "Dependency audit in CI"],
     stack: ["React", "TypeScript", "Mantine", "IndexedDB", "PWA"],
     live: "https://budget-tracker-two-kohl.vercel.app",
+    selected: true,
   },
   {
     slug: "snip-links",
@@ -218,6 +218,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Sanitizer and store tests", "Browser test"],
     stack: ["Vue", "TypeScript", "Pinia", "IndexedDB"],
+    live: "https://md-notes-mu.vercel.app",
   },
   {
     slug: "weather-commute",
@@ -260,6 +261,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Timer and history tests with fake clocks", "Browser test that fast-forwards a full session"],
     stack: ["TypeScript", "Web Components", "PWA"],
+    live: "https://pomodoro-focus-sigma.vercel.app",
   },
   {
     slug: "ui-kit",
@@ -274,6 +276,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Keyboard and ARIA tests for every component", "Automated accessibility scans"],
     stack: ["React", "TypeScript", "WAI-ARIA"],
+    live: "https://ui-kit-brown-theta.vercel.app",
   },
   {
     slug: "dsa-in-typescript",
@@ -302,6 +305,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Sharded CI runs", "Visual and accessibility checks"],
     stack: ["Playwright", "TypeScript", "React"],
+    live: "https://e2e-testing-lab-opal.vercel.app",
   },
 ];
 
