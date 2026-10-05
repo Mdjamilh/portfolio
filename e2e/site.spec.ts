@@ -1,12 +1,30 @@
 import { expect, expectAccessible, test } from "./fixtures";
 
-test("home page presents the abstract, the record and every project", async ({ page, problems }) => {
+test("home presents the name, the build diagram, figures and featured work", async ({ page, problems }) => {
   void problems;
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Md. Jamil Hossain");
-  await expect(page.getByRole("complementary", { name: "The record" })).toContainText("Public repositories");
-  await expect(page.locator("#index tbody tr")).toHaveCount(19);
+  await expect(page.getByRole("figure", { name: /How each project is built/ }).getByRole("listitem")).toHaveCount(4);
+  await expect(page.getByRole("definition").first()).toHaveText("19");
+  await expect(page.getByRole("article")).toHaveCount(3);
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
   await expectAccessible(page);
+});
+
+test("each section is its own page, marked in the navigation", async ({ page, problems }) => {
+  void problems;
+  for (const [name, path, heading] of [
+    ["Projects", "/projects", "Projects"],
+    ["About", "/about", "About"],
+    ["Resume", "/resume", "Resume"],
+  ] as const) {
+    await page.goto("/");
+    await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+    await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name })).toHaveAttribute("aria-current", "page");
+    await expectAccessible(page);
+  }
 });
 
 test("the command palette finds a project by technology and opens it", async ({ page, problems, isMobile }) => {
@@ -20,59 +38,63 @@ test("the command palette finds a project by technology and opens it", async ({ 
   await expect(page.getByRole("option").first()).toContainText("Patient record explorer");
   await expectAccessible(page);
   await input.press("Enter");
-  await expect(page).toHaveURL(/\/work\/fhir-patient-explorer$/);
+  await expect(page).toHaveURL(/\/projects\/fhir-patient-explorer$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Patient record explorer");
 });
 
-test("the index filters by domain and by typed technology", async ({ page, problems }) => {
+test("more projects filter by domain and by typed technology", async ({ page, problems }) => {
   void problems;
-  await page.goto("/#index");
-  const rows = page.locator("#index tbody tr:visible");
+  await page.goto("/projects");
+  await expect(page.getByRole("article")).toHaveCount(6);
+  const cards = page.locator(".grid > li:visible");
+  await expect(cards).toHaveCount(13);
   await page.getByRole("radio", { name: "Healthcare" }).check();
-  await expect(rows).toHaveCount(7);
+  await expect(cards).toHaveCount(4);
   await page.getByRole("radio", { name: "All" }).check();
-  await page.getByRole("searchbox", { name: "Filter by name or technology" }).fill("go");
-  await expect(rows.first()).toContainText("envguard");
-  await expect(page.getByText(/of 19 projects/)).toBeVisible();
+  await page.getByRole("searchbox", { name: "Filter by name or technology" }).fill("vue");
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toContainText("Markdown notes");
+  await expect(page.getByText("1 of 13 projects")).toBeVisible();
   await page.getByRole("searchbox", { name: "Filter by name or technology" }).fill("cobol");
   await expect(page.getByText("No project matches that filter.")).toBeVisible();
 });
 
 test("case studies read as problem, approach and evidence, with paging", async ({ page, problems }) => {
   void problems;
-  await page.goto("/work/care-note-ai");
+  await page.goto("/projects/care-note-ai");
   for (const name of ["Problem", "Approach", "Evidence"]) await expect(page.getByRole("heading", { level: 2, name: new RegExp(name) })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open the live demo" })).toHaveAttribute("href", /vercel\.app/);
+  await expect(page.getByRole("img", { name: "Screenshot of Care note assistant" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Open the live demo/ })).toHaveAttribute("href", /vercel\.app/);
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Projects" })).toHaveAttribute("aria-current", "page");
   await expectAccessible(page);
   await page.getByRole("link", { name: /Next/ }).click();
-  await expect(page).toHaveURL(/\/work\/guideline-rag-search$/);
+  await expect(page).toHaveURL(/\/projects\/guideline-rag-search$/);
 });
 
-test("the resume page offers printing and has no PDF until one is added", async ({ page, problems }) => {
+test("without a PDF the resume page shows one blank sheet", async ({ page, problems }) => {
   void problems;
   await page.goto("/resume");
-  await expect(page.getByRole("button", { name: "Print this page" })).toBeVisible();
+  const sheet = page.getByRole("img", { name: "Resume page" });
+  await expect(sheet).toBeVisible();
+  await expect(sheet).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(sheet).toBeEmpty();
   await expect(page.getByRole("link", { name: "Download PDF" })).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "Selected projects" })).toBeVisible();
-  await expectAccessible(page);
 });
 
-test("the theme choice survives a reload", async ({ page, problems }) => {
+test("the light theme is remembered across pages", async ({ page, problems }) => {
   void problems;
   await page.goto("/");
-  const toggle = page.getByRole("button", { name: /Colour theme/ });
-  await expect(toggle).toHaveAccessibleName("Colour theme: system");
-  await toggle.click();
-  await expect(toggle).toHaveAccessibleName("Colour theme: light");
-  await toggle.click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expectAccessible(page);
+  await page.goto("/about");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect(page.locator("html")).not.toHaveAttribute("data-theme", "light");
 });
 
 test("unknown addresses get a helpful page", async ({ page }) => {
   const response = await page.goto("/no-such-page");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("This page is not in the index.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("This page isn't in the drawings.");
 });
