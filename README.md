@@ -1,24 +1,24 @@
 # Portfolio of Md. Jamil Hossain
 
-The source of my personal portfolio site: a short introduction, six selected projects, an index of every public project with a case study for each, and a resume page.
+The source of my personal portfolio site: a home page, a projects page with a case study for every project, an about page and a resume.
 
 **Live:** https://mdjamilh.vercel.app
 
-![Home page: the name, an abstract, and a record of repositories, commits and live deployments](docs/home.png)
+![Home page: the name, an animated diagram of how each project is built, and figures read from GitHub](docs/home.png)
 
 ## Design
 
-The site is set like a printed report rather than a landing page: warm paper and ink colours, a serif for headings, numbered sections, and hairline rules instead of cards and shadows. It has a dark theme and follows the system setting unless a visitor picks one.
+The site is drawn like an engineering blueprint: a deep navy sheet with a faint drafting grid, cyan for anything live or interactive, amber for annotations, and corner registration marks on panels. Each page is a numbered "sheet", and a light theme redraws the same plan on white drafting paper.
 
-| Part | What it shows |
+| Page | What it shows |
 |---|---|
-| Title page | An abstract of my work, keywords, and "the record": repository, commit and deployment counts |
-| Selected work | Six numbered projects with links to the case study, the live demo and the source |
-| Index of projects | Every project in one table, filterable by domain or technology, with its commit count and last change |
-| Case studies | One page per project: problem, approach and evidence, with stack and repository facts |
-| Resume | A printable resume generated from the same data, or a PDF once one is added |
+| Home | Name and introduction, an animated diagram of the four layers every project is built through (data, API, interface, verification), figures from GitHub, and three featured projects |
+| Projects | Six selected projects as "spec sheets" with real screenshots, then every other project as a filterable card |
+| Project pages | One case study per project: screenshot, problem, approach and evidence, with stack and repository facts |
+| About | Background, working principles and a technical specification of the tools used |
+| Resume | The resume PDF, once one is added |
 
-Press <kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>/</kbd>) on any page to search projects, technologies and pages from the keyboard.
+Press <kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>/</kbd>) on any page to jump to a project, technology or page from the keyboard. Motion is limited to a few CSS animations, which stop entirely when the visitor's system asks for reduced motion.
 
 ## The figures are real
 
@@ -28,12 +28,14 @@ The commit counts and last-change dates come from the GitHub API **when the site
 
 All content lives in two files, so no page needs editing:
 
-- `src/data/profile.ts`: name, abstract, about text, working principles, technologies, contact details and education. Empty fields are hidden.
-- `src/data/projects.ts`: every project's summary, problem, approach, evidence, stack and links. `selected: true` puts a project in Selected work.
+- `src/data/profile.ts`: name, introduction, about text, working principles, technologies, contact details and education. Empty fields are hidden.
+- `src/data/projects.ts`: every project's summary, problem, approach, evidence, stack and links. `selected: true` makes a project one of the six spec sheets on the projects page.
 
-### Adding a resume PDF
+### Adding the resume
 
-Put the file at `public/resume.pdf` and push. The Resume page then shows the PDF with a download button above the generated version. No code changes are needed.
+Put the PDF in `public/resume/` (any file name) and push. The Resume page shows it with download and open buttons. Until a PDF is there, the page shows a blank sheet. To replace the resume, swap the file; if the folder holds several PDFs, the first by name is used.
+
+Screenshots for the project pages live in `src/assets/shots/<repository>.png` and are resized automatically at build time.
 
 ## Quality
 
