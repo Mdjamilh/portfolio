@@ -59,22 +59,25 @@ const isCurrent = (href: string) => (href === "/" ? path === "/" : path === href
 </header>
 
 <script>
-  const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]")!;
-  const root = document.documentElement;
-  const show = () => button.setAttribute("aria-label", root.dataset.theme === "light" ? "Switch to dark theme" : "Switch to light theme");
-  button.addEventListener("click", () => {
-    const light = root.dataset.theme !== "light";
-    if (light) root.dataset.theme = "light";
-    else delete root.dataset.theme;
-    try {
-      if (light) localStorage.setItem("theme", "light");
-      else localStorage.removeItem("theme");
-    } catch {
-      // Applied for this page only.
-    }
+  // The header is swapped with each page, so the button is bound on every page load.
+  document.addEventListener("astro:page-load", () => {
+    const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]")!;
+    const root = document.documentElement;
+    const show = () => button.setAttribute("aria-label", root.dataset.theme === "light" ? "Switch to dark theme" : "Switch to light theme");
+    button.addEventListener("click", () => {
+      const light = root.dataset.theme !== "light";
+      if (light) root.dataset.theme = "light";
+      else delete root.dataset.theme;
+      try {
+        if (light) localStorage.setItem("theme", "light");
+        else localStorage.removeItem("theme");
+      } catch {
+        // Applied for this page only.
+      }
+      show();
+    });
     show();
   });
-  show();
 </script>
 
 <style>

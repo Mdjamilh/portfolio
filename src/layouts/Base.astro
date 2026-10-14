@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import CommandPalette from "../components/CommandPalette.astro";
+import { ClientRouter } from "astro:transitions";
 import { profile } from "../data/profile";
 
 interface Props {
@@ -30,6 +31,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <script is:inline src="/theme-init.js"></script>
+    <ClientRouter />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -43,9 +45,24 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 </html>
 
 <script>
-  // Fade sections up once as they scroll into view.
-  const items = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window) {
+  // Pages are swapped in place rather than reloaded, and each swap replaces
+  // the <html> attributes, so the saved theme is re-applied before paint.
+  document.addEventListener("astro:after-swap", () => {
+    document.documentElement.classList.add("js");
+    try {
+      if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light";
+    } catch {
+      // Storage blocked: keep the default theme.
+    }
+  });
+
+  // Fade sections up once as they scroll into view, on every page shown.
+  document.addEventListener("astro:page-load", () => {
+    const items = document.querySelectorAll(".reveal:not(.in)");
+    if (!("IntersectionObserver" in window)) {
+      items.forEach((el) => el.classList.add("in"));
+      return;
+    }
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -58,9 +75,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       { rootMargin: "0px 0px -8% 0px" },
     );
     items.forEach((el) => io.observe(el));
-  } else {
-    items.forEach((el) => el.classList.add("in"));
-  }
+  });
 </script>
 
 <style>
