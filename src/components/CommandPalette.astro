@@ -15,6 +15,7 @@ const entries: Entry[] = [
 ];
 ---
 
+<div data-astro-transition-persist="palette">
 <dialog class="palette" aria-label="Find a page or project" data-palette>
   <form method="dialog" role="search">
     <label class="visually-hidden" for="palette-input">Find a page or project</label>
@@ -37,9 +38,13 @@ const entries: Entry[] = [
 </dialog>
 
 <script type="application/json" id="palette-entries" set:html={JSON.stringify(entries)} />
+</div>
 
 <script>
+  import { navigate } from "astro:transitions/client";
   import { rank, type Entry } from "../lib/search";
+
+  // The palette is kept across page swaps (transition:persist), so it is set up once.
 
   const dialog = document.querySelector<HTMLDialogElement>("[data-palette]")!;
   const input = dialog.querySelector("input")!;
@@ -83,7 +88,7 @@ const entries: Entry[] = [
   function go(entry: Entry) {
     dialog.close();
     if (/^https?:/.test(entry.href)) window.open(entry.href, "_blank", "noopener");
-    else window.location.href = entry.href;
+    else void navigate(entry.href);
   }
 
   function open() {
@@ -118,7 +123,10 @@ const entries: Entry[] = [
     if (e.target === dialog) dialog.close();
   });
 
-  document.querySelectorAll("[data-open-palette]").forEach((b) => b.addEventListener("click", open));
+  // The header button is replaced on every page, so clicks are caught at the document.
+  document.addEventListener("click", (e) => {
+    if (e.target instanceof Element && e.target.closest("[data-open-palette]")) open();
+  });
 
   document.addEventListener("keydown", (e) => {
     const typing = e.target instanceof HTMLElement && (e.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
