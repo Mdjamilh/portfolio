@@ -331,7 +331,33 @@ kbd {
   transform: none;
 }
 
+/* Moving between pages: the old sheet fades out as the new one rises in. */
+@keyframes sheet-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+::view-transition-old(root) {
+  animation: 160ms ease-in both sheet-out;
+}
+
+::view-transition-new(root) {
+  animation: 260ms ease-out 60ms both sheet-in;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
   *,
   *::before,
   *::after {
