@@ -27,6 +27,31 @@ test("each section is its own page, marked in the navigation", async ({ page, pr
   }
 });
 
+test("moving between pages swaps content in place without reloading", async ({ page, problems }) => {
+  void problems;
+  await page.goto("/");
+  // A full reload would clear this; an in-place swap keeps it.
+  await page.evaluate(() => ((window as unknown as { marker: number }).marker = 42));
+  const nav = page.getByRole("navigation", { name: "Main" });
+  for (const [name, path] of [
+    ["Projects", "/projects"],
+    ["About", "/about"],
+    ["Resume", "/resume"],
+    ["Home", "/"],
+  ] as const) {
+    await nav.getByRole("link", { name }).click();
+    await expect(page).toHaveURL(new RegExp(`${path === "/" ? "/" : path}$`));
+    await expect(nav.getByRole("link", { name })).toHaveAttribute("aria-current", "page");
+  }
+  await page.getByRole("link", { name: "Projects" }).first().click();
+  await page.getByRole("radio", { name: "Healthcare" }).check();
+  await expect(page.locator(".grid > li:visible")).toHaveCount(4);
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await nav.getByRole("link", { name: "About" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(await page.evaluate(() => (window as unknown as { marker?: number }).marker)).toBe(42);
+});
+
 test("the command palette finds a project by technology and opens it", async ({ page, problems, isMobile }) => {
   void problems;
   await page.goto("/");
