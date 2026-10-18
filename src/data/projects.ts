@@ -233,6 +233,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Rule and time-zone tests, including daylight-saving changes", "Browser test"],
     stack: ["SvelteKit", "Svelte", "TypeScript"],
+    live: "https://weather-commute-beryl.vercel.app",
   },
   {
     slug: "job-tracker",
