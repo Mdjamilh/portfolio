@@ -204,6 +204,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Unit and component tests", "Browser test on recorded responses"],
     stack: ["React", "TypeScript", "TanStack Query"],
+    live: "https://gitpulse-sigma-red.vercel.app",
   },
   {
     slug: "md-notes",
@@ -248,6 +249,7 @@ export const projects: Project[] = [
     ],
     evidence: ["Authorization tests proving one user cannot read another's data", "Browser tests"],
     stack: ["Next.js", "TypeScript", "PostgreSQL", "Tailwind CSS"],
+    live: "https://job-tracker-ten-tawny.vercel.app",
   },
   {
     slug: "pomodoro-focus",
