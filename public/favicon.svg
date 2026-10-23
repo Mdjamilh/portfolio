@@ -7,7 +7,7 @@
   </defs>
   <rect width="64" height="64" rx="15" fill="#07111f"/>
   <rect x="1.5" y="1.5" width="61" height="61" rx="13.5" fill="none" stroke="#5fd4ff" stroke-opacity="0.35" stroke-width="1.5"/>
-  <g fill="none" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" transform="translate(32 32) scale(0.7) translate(-32 -32)">
     <path d="M27 17v18.5c0 6.5-3.6 10.5-9.5 10.5-2.6 0-4.6-.9-6-2.4"/>
     <path d="M37 17v30M53 17v30M37 32h16"/>
   </g>
