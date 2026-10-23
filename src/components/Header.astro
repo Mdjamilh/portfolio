@@ -16,10 +16,19 @@ const isCurrent = (href: string) => (href === "/" ? path === "/" : path === href
   <div class="bar wrap">
     <a class="name" href="/" aria-label={`${profile.name}, home`}>
       <span class="mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" width="30" height="30">
-          <rect x="1" y="1" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5"></rect>
-          <path d="M1 9h30M9 1v30" stroke="currentColor" stroke-width="0.75" opacity="0.5"></path>
-          <text x="19.5" y="24" font-size="11" font-family="monospace" text-anchor="middle" fill="currentColor">JH</text>
+        <svg viewBox="0 0 64 64" width="32" height="32">
+          <defs>
+            <linearGradient id="mark-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#7fe3ff"></stop>
+              <stop offset="1" stop-color="#2fa8ff"></stop>
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="15" fill="#07111f"></rect>
+          <rect x="1.5" y="1.5" width="61" height="61" rx="13.5" fill="none" stroke="#5fd4ff" stroke-opacity="0.35" stroke-width="1.5"></rect>
+          <g fill="none" stroke="url(#mark-gradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M27 17v18.5c0 6.5-3.6 10.5-9.5 10.5-2.6 0-4.6-.9-6-2.4"></path>
+            <path d="M37 17v30M53 17v30M37 32h16"></path>
+          </g>
         </svg>
       </span>
       <span class="who">{profile.name}</span>
