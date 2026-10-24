@@ -5,7 +5,7 @@ test("home presents the name, the build diagram, figures and featured work", asy
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Md. Jamil Hossain");
   await expect(page.getByRole("figure", { name: /How each project is built/ }).getByRole("listitem")).toHaveCount(4);
-  await expect(page.getByRole("definition").first()).toHaveText("19");
+  await expect(page.getByRole("definition").first()).toHaveText("21");
   await expect(page.getByRole("article")).toHaveCount(3);
   await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
   await expectAccessible(page);
@@ -45,7 +45,7 @@ test("moving between pages swaps content in place without reloading", async ({ p
   }
   await page.getByRole("link", { name: "Projects" }).first().click();
   await page.getByRole("radio", { name: "Healthcare" }).check();
-  await expect(page.locator(".grid > li:visible")).toHaveCount(4);
+  await expect(page.locator(".grid > li:visible")).toHaveCount(6);
   await page.getByRole("button", { name: "Switch to light theme" }).click();
   await nav.getByRole("link", { name: "About" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -72,14 +72,14 @@ test("more projects filter by domain and by typed technology", async ({ page, pr
   await page.goto("/projects");
   await expect(page.getByRole("article")).toHaveCount(6);
   const cards = page.locator(".grid > li:visible");
-  await expect(cards).toHaveCount(13);
+  await expect(cards).toHaveCount(15);
   await page.getByRole("radio", { name: "Healthcare" }).check();
-  await expect(cards).toHaveCount(4);
+  await expect(cards).toHaveCount(6);
   await page.getByRole("radio", { name: "All" }).check();
   await page.getByRole("searchbox", { name: "Filter by name or technology" }).fill("vue");
   await expect(cards).toHaveCount(1);
   await expect(cards.first()).toContainText("Markdown notes");
-  await expect(page.getByText("1 of 13 projects")).toBeVisible();
+  await expect(page.getByText("1 of 15 projects")).toBeVisible();
   await page.getByRole("searchbox", { name: "Filter by name or technology" }).fill("cobol");
   await expect(page.getByText("No project matches that filter.")).toBeVisible();
 });
