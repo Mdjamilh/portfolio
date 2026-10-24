@@ -13,13 +13,13 @@ export const profile = {
 
   abstract:
     "I build software end to end, from the database and API to the interface, tests and documentation. " +
-    "My projects range from real-time collaboration and offline-first apps to command-line tools, accessible UI components and healthcare applications built on open data standards.",
+    "My projects include full-stack web apps in TypeScript and Python, real-time collaboration, offline-first apps, command-line tools, accessible UI components and healthcare applications built on open data standards.",
 
-  keywords: ["TypeScript", "React", "Next.js", "Node.js", "PostgreSQL", "HL7 FHIR", "Testing", "Accessibility"],
+  keywords: ["TypeScript", "Python", "React", "Next.js", "Node.js", "PostgreSQL", "HL7 FHIR", "Testing", "Accessibility"],
 
   about: [
     "I care about software that people can rely on. In practice that means writing the test before trusting the feature, reading the standard before inventing a format, and documenting decisions so the next developer does not have to guess.",
-    "My projects are deliberately varied: real-time collaboration, offline-first storage, accessible components, developer tooling, data structures, and healthcare applications built on public clinical data, in TypeScript, Go, React, Vue and Svelte.",
+    "My projects are deliberately varied: real-time collaboration, offline-first storage, accessible components, developer tooling, data structures, and healthcare applications built on public clinical data, in TypeScript, Python, Go, React, Vue and Svelte.",
     "Every project here is public, with its history, tests and continuous integration visible on GitHub, and most can be tried live.",
   ],
 
@@ -31,11 +31,11 @@ export const profile = {
   ],
 
   skills: [
-    { group: "Languages", items: ["TypeScript", "JavaScript", "Go", "SQL"] },
-    { group: "Front end", items: ["React", "Next.js", "Vue", "Svelte", "Tailwind CSS", "Web Components"] },
-    { group: "Back end and data", items: ["Node.js", "Express", "Hono", "PostgreSQL", "pgvector", "Drizzle", "SQLite", "IndexedDB"] },
+    { group: "Languages", items: ["TypeScript", "JavaScript", "Python", "Go", "SQL", "CSS"] },
+    { group: "Front end", items: ["React", "Next.js", "Vue", "Svelte", "htmx", "Tailwind CSS", "Web Components"] },
+    { group: "Back end and data", items: ["Node.js", "Express", "Fastify", "Hono", "Python", "FastAPI", "SQLAlchemy", "PostgreSQL", "pgvector", "Drizzle", "SQLite", "IndexedDB"] },
     { group: "AI and data standards", items: ["HL7 FHIR R4", "HL7 v2", "RxNorm", "openFDA", "Claude API", "Ollama", "Retrieval-augmented generation"] },
-    { group: "Quality and delivery", items: ["Vitest", "Playwright", "axe", "GitHub Actions", "Docker", "Vercel"] },
+    { group: "Quality and delivery", items: ["Vitest", "pytest", "Playwright", "axe", "GitHub Actions", "Docker", "Vercel"] },
   ],
 
   /** Shown on the resume page. Add entries when available. */
