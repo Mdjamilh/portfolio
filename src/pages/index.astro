@@ -12,7 +12,7 @@ const facts = await buildFacts(
 );
 const figures = totals(facts);
 const live = projects.filter((p) => p.live && !p.live.includes("github.com")).length;
-const featured = ["clinic-appointment-scheduler", "realtime-kanban", "budget-tracker"].map((slug) => projects.find((p) => p.slug === slug)!);
+const featured = ["split-ledger", "pantry-planner", "realtime-kanban"].map((slug) => projects.find((p) => p.slug === slug)!);
 ---
 
 <Base>
